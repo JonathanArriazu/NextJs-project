@@ -1,10 +1,9 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {getEventById, getFeaturedEvents} from '../../../helpers/api-util'
 import EventSummary from '../../../components/event-detail/event-summary'
 import EventLogistics from '../../../components/event-detail/event-logistics'
 import EventContent from '../../../components/event-detail/event-content'
-import ErrorAlert from '../../../components/events/error-alert'
-import Button from '../../../components/ui/button'
+import Head from 'next/head'
 
 const EventDetailPage = (props) => {
 
@@ -28,13 +27,17 @@ const EventDetailPage = (props) => {
   }
 
   return (
-    <Fragment>
+    <>
+      <Head>
+        <title>{event.title}</title>
+        <meta name={event.description} content='Find a lot of great events that allow you to evolve...'/>
+      </Head>
       <EventSummary title={event.title} />
       <EventLogistics date={event.date} adress={event.location} image={event.image}  imageAlt={event.title}/>
       <EventContent>
         <p>{event.description}</p>
       </EventContent>
-    </Fragment>
+    </>
   )
 }
 
