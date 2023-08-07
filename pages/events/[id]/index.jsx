@@ -1,33 +1,29 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import {getEventById} from '../../../dummy-data'
+import {getEventById, getFeaturedEvents} from '../../../helpers/api-util'
 import EventSummary from '../../../components/event-detail/event-summary'
 import EventLogistics from '../../../components/event-detail/event-logistics'
 import EventContent from '../../../components/event-detail/event-content'
-import { useRouter } from 'next/router'
 import ErrorAlert from '../../../components/events/error-alert'
 import Button from '../../../components/ui/button'
 
-const EventDetailPage = () => {
+const EventDetailPage = (props) => {
 
-  const router = useRouter();
-  const eventId = router.query.id;
-  const [event, setEvent] = useState(null);
+  // const router = useRouter();
+  // const eventId = router.query.eventId;
+  // const [event, setEvent] = useState(null);
 
-  useEffect(() => {
+  const event = props.selectedEvent;
+
+  /* useEffect(() => {
     const eventById = getEventById(eventId);
     setEvent(eventById);
-  }, [eventId]);
+  }, [eventId]); */
 
   if (!event) {
     return (
-      <>
-        <ErrorAlert>
-          <p>No events found!</p>
-        </ErrorAlert>       
-        <div className="center">
-          <Button link='/events'>Show all events</Button>
-        </div>
-      </>
+      <div className='center'>
+          <p>Loading...</p>
+      </div>
     )
   }
 
@@ -40,6 +36,30 @@ const EventDetailPage = () => {
       </EventContent>
     </Fragment>
   )
+}
+
+export async function getStaticProps(context) {
+  const eventId = context.params.id;
+  const event = await getEventById(eventId);
+
+  return {
+    props: {
+      selectedEvent: event
+    },
+    revalidate: 30
+  }
+}
+
+export async function getStaticPaths() {
+  const events = await getFeaturedEvents();
+
+  const paths = events.map(event => ({ params: { id: event.id } }));
+
+  return {
+    paths: paths,
+    fallback: 'blocking' // if true or 'blocking' we say to nextJs that there are more pages to be loaded apart from the ones that come from the getFeaturedEvents() function
+}
+
 }
 
 export default EventDetailPage
